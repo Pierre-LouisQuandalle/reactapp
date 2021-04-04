@@ -8,10 +8,13 @@ const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
 
 var SongForACity = undefined;
 class App extends Component {
-  componentWillMount() {
+  componentDidMount() {
 
     this.loadBlockchainData()
     this.useSong()
+  }
+  ClaimToken(){
+    console.log("coucou")
   }
 
   async loadBlockchainData() {
@@ -39,32 +42,43 @@ class App extends Component {
     this.setState({tokenName})
     const totalToken =await SongForACity.methods.tokenCounter().call()
     this.setState({totalToken})
-    const tokenUrl = await SongForACity.methods.tokenURI(0).call()
-    fetch('https://cors-anywhere.herokuapp.com/'+tokenUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": 'application/json',
-          redirect: 'follow'
+    const tokenUrl = await SongForACity.methods.tokenURI(1).call()
+    console.log(tokenUrl)
+
+    // ATTTENTION : bug avec  le  serveru  vicoitre.fr qui  est configuré  pour  bloquer les requetes  HTTP cross origin et ne  permet donc  pas de lire la réponse.
+    // const response  = await fetch(tokenUrl)
+    // const responseData = await response.json()
+
+    const responseData  = {
+      "title": "Asset Metadata",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Song For A City"
+        },
+        "description": {
+          "type": "string",
+          "description": "An audio album released in 2018. Listen here https://victoire-oberkampf.bandcamp.com/album/songs-for-a-city"
+        },
+        "image": {
+          "type": "string",
+          "description": "http://www.victoire-oberkampf.fr/NFT-Workshop/SongForACity.jpeg"
         }
-    })
-    .then(fetchResponse => {
-      console.log(fetchResponse)
-      return fetchResponse.json()
-    })
-    .then(responseData => {
-      console.log(responseData)
-      const name = responseData.properties.name.description
-      const img = responseData.properties.image.description
-      const description = responseData.properties.description.description
-      this.setState({ token: {
-        name,
-        img,
-        description
-      }})
-    })
-    console.log(tokenName,totalToken,)
+      }
+    }
+
+    const name = responseData.properties.name.description
+    const image = responseData.properties.image.description
+    const description = responseData.properties.description.description
+    this.setState({ token: {
+      name,
+      image,
+      description
+    }})
     
   }
+  
   constructor(props) {
     super(props)
     this.state = {
@@ -84,14 +98,16 @@ class App extends Component {
   render() {
      return (
       <div className="container">
+      <img  src="/logo.png" alt="logo"/>
       <h1>My app!</h1>
-      <p>Your account: {this.state.account} </p>
-      <p>Chain ID: {this.state.chainID}</p>
-      <p>Block number: {this.state.lastBlock}</p>
-      <div>Image : <img src={this.state.image} height="70" width="70" alt="Tableau song "></img></div>
-                <div>Name : {this.state.name} </div>
-                <div>Description : {this.state.description} </div>
-      </div>
+  <p>Your account: {this.state.account} </p>
+  <p>Chain ID: {this.state.chainID}</p>
+  <p>Block number: {this.state.lastBlock}</p>
+  <div>Image : <img src={this.state.token.image} height="70" width="70" alt="Tableau song "></img></div>
+            <div>Name : {this.state.token.name} </div>
+            <div>Description : {this.state.token.description} </div>
+            <button type="button" class="btn btn-dark" onClick={this.ClaimToken}>Claim token!</button>
+</div>
     );  
   }
 }
