@@ -62,7 +62,7 @@ class App extends Component {
         description
       }})
     })
-    console.log("adress:", toutDou.address, song.address,tokenName,totalToken,)
+    console.log(tokenName,totalToken,)
     
   }
   constructor(props) {
