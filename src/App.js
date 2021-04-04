@@ -39,8 +39,30 @@ class App extends Component {
     this.setState({tokenName})
     const totalToken =await SongForACity.methods.tokenCounter().call()
     this.setState({totalToken})
-
-    console.log("adress:", toutDou.address, song.address,tokenName,totalToken)
+    const tokenUrl = await SongForACity.methods.tokenURI(0).call()
+    fetch('https://cors-anywhere.herokuapp.com/'+tokenUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": 'application/json',
+          redirect: 'follow'
+        }
+    })
+    .then(fetchResponse => {
+      console.log(fetchResponse)
+      return fetchResponse.json()
+    })
+    .then(responseData => {
+      console.log(responseData)
+      const name = responseData.properties.name.description
+      const img = responseData.properties.image.description
+      const description = responseData.properties.description.description
+      this.setState({ token: {
+        name,
+        img,
+        description
+      }})
+    })
+    console.log("adress:", toutDou.address, song.address,tokenName,totalToken,)
     
   }
   constructor(props) {
@@ -50,7 +72,12 @@ class App extends Component {
       chainID: '',
       lastBlock: '',
       tokenName:'',
-      totalToken:''
+      totalToken:'',
+      token:{
+        image:'',
+        name:'',
+        description:''
+      }
     }
     }
   
@@ -58,11 +85,14 @@ class App extends Component {
      return (
       <div className="container">
       <h1>My app!</h1>
-      <p>Your account:{this.state.account} </p>
+      <p>Your account: {this.state.account} </p>
       <p>Chain ID: {this.state.chainID}</p>
       <p>Block number: {this.state.lastBlock}</p>
+      <div>Image : <img src={this.state.image} height="70" width="70" alt="Tableau song "></img></div>
+                <div>Name : {this.state.name} </div>
+                <div>Description : {this.state.description} </div>
       </div>
-    );
+    );  
   }
 }
 
