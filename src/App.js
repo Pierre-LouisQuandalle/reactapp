@@ -7,14 +7,13 @@ const web3 = new Web3(Web3.givenProvider || "http://localhost:8545")
 //const network = await web3.eth.net.getNetworkType() 
 
 var SongForACity = undefined;
+var Doucement = undefined;
 class App extends Component {
   componentDidMount() {
 
     this.loadBlockchainData()
     this.useSong()
-  }
-  ClaimToken(){
-    console.log("coucou")
+    this.viewDoucement()
   }
 
   async loadBlockchainData() {
@@ -38,14 +37,16 @@ class App extends Component {
     SongForACity = new web3.eth.Contract(song.abi, song.address, {
       from: this.state.account
     })
+    const address=song.address
+    this.setState({address})
     const tokenName =await SongForACity.methods.name().call()
     this.setState({tokenName})
     const totalToken =await SongForACity.methods.tokenCounter().call()
     this.setState({totalToken})
-    const tokenUrl = await SongForACity.methods.tokenURI(1).call()
+    const tokenUrl = await SongForACity.methods.tokenURI(0).call()
     console.log(tokenUrl)
 
-    // ATTTENTION : bug avec  le  serveru  vicoitre.fr qui  est configuré  pour  bloquer les requetes  HTTP cross origin et ne  permet donc  pas de lire la réponse.
+    // ATTTENTION : bug avec  le  serveru  victoire-oberkampf.fr qui est configuré pour bloquer les requetes HTTP cross origin et ne  permet donc  pas de lire la réponse.
     // const response  = await fetch(tokenUrl)
     // const responseData = await response.json()
 
@@ -78,6 +79,49 @@ class App extends Component {
     }})
     
   }
+
+  async viewDoucement(){
+    Doucement = new web3.eth.Contract(toutDou.abi, toutDou.address, {
+      from: this.state.account
+    })
+    const address2=toutDou.address
+    this.setState({address2})
+    const tokenName2 =await Doucement.methods.name().call()
+    this.setState({tokenName2})
+    const totalToken2 =await Doucement.methods.tokenCounter().call()
+    this.setState({totalToken2})
+    const tokenUrl2 = await Doucement.methods.tokenURI(0).call()
+    console.log(tokenUrl2)
+    //meme probleme de requete a cause de cors
+    //const response  = await fetch(tokenUrl2)
+    //const responseData = await response.json()
+    const responseData={
+      "title": "Asset Metadata",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tout Doucement"
+        },
+        "description": {
+          "type": "string",
+          "description": "An audio album released in 2019. Listen here https://victoire-oberkampf.bandcamp.com/album/tout-doucement"
+        },
+        "image": {
+          "type": "string",
+          "description": "http://www.victoire-oberkampf.fr/NFT-Workshop/ToutDoucement.jpeg"
+        }
+      }
+    }
+    const name = responseData.properties.name.description
+    const image = responseData.properties.image.description
+    const description = responseData.properties.description.description
+    this.setState({ token2: {
+      name,
+      image,
+      description
+    }})
+  }
   
   constructor(props) {
     super(props)
@@ -87,7 +131,17 @@ class App extends Component {
       lastBlock: '',
       tokenName:'',
       totalToken:'',
+      address:'',
       token:{
+        image:'',
+        name:'',
+        description:''
+      },
+      adress2:'',
+      tokenName2:'',
+      totalToken2:'',
+      tokenUrl2:'',
+      token2:{
         image:'',
         name:'',
         description:''
@@ -97,16 +151,50 @@ class App extends Component {
   
   render() {
      return (
-      <div className="container">
+<div className="container">
       <img  src="/logo.png" alt="logo"/>
-      <h1>My app!</h1>
-  <p>Your account: {this.state.account} </p>
-  <p>Chain ID: {this.state.chainID}</p>
-  <p>Block number: {this.state.lastBlock}</p>
-  <div>Image : <img src={this.state.token.image} height="70" width="70" alt="Tableau song "></img></div>
-            <div>Name : {this.state.token.name} </div>
-            <div>Description : {this.state.token.description} </div>
-            <button type="button" class="btn btn-dark" onClick={this.ClaimToken}>Claim token!</button>
+      <h1 style={{fontSize:'70px',marginLeft:'-10px'}}><center>NftApp</center></h1>
+  <h4>Your account: {this.state.account} </h4>
+
+  <h5>Chain ID: {this.state.chainID}</h5>
+  <h5>Block number: <b>{this.state.lastBlock}</b></h5>
+  <div className="card" styleName="width: 18rem;">
+  <img src={this.state.token.image}  alt="Tableau song " class="card-img-top"></img>
+  <div className="card-body">
+  <h3 className="song">Song for a City</h3>
+  <p className="card-text">Une peinture Nft déployée sur Rinkeby.</p>
+  </div>
+  <ul className="list-group list-group-flush">
+    <li className="list-group-item">Name : {this.state.token.name}</li>
+    <li className="list-group-item">Number : {this.state.totalToken}</li>
+    <li className="list-group-item">Description : {this.state.token.description}</li>
+    <li className="list-group-item" >Address : "<a href="https://testnets.opensea.io/assets/victoire-oberkampf-song-for-a-city" class="link-info">{this.state.address }</a>" (View on OpenSea)</li>
+    <li className="list-group-item" class="text-center"><button type="button" class="btn btn-dark .btn-lg" 
+    onClick={(event) => {event.preventDefault()
+      SongForACity.methods.claimAToken().send({ from: this.state.account })
+        }}
+    >Claim token !</button></li>
+  </ul>
+  </div>
+  <p></p>
+  <p></p>
+  <div className="card" styleName="width: 18rem;">
+  <img src={this.state.token2.image}  alt="Tout Doucement" class="card-img-top"></img>
+  <div className="card-body">
+  <h3 className="song">Tout Doucement</h3>
+  <p className="card-text">Une photographie représentant des petits personnages qui pendouillent déployée sur Rinkeby.</p>
+  </div>
+  <ul className="list-group list-group-flush">
+    <li className="list-group-item">Name : {this.state.token2.name}</li>
+    <li className="list-group-item">Number : {this.state.totalToken2}</li>
+    <li className="list-group-item">Description : {this.state.token2.description}</li>
+    <li className="list-group-item" >Address : "<a href="https://testnets.opensea.io/assets/victoire-oberkampf-tout-doucement" class="link-info">{this.state.address2 }</a>" (View on OpenSea)</li>
+    <li className="list-group-item" class="text-center"><button type="button" class="btn btn-success .btn-lg" 
+    onClick={(event) => {event.preventDefault()
+      Doucement.methods.buyAToken().send({ from: this.state.account,value: 2*10**17 })}}
+      >Buy this token !</button></li>
+  </ul>
+  </div>
 </div>
     );  
   }

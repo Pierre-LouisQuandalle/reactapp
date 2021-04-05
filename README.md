@@ -22,7 +22,8 @@ Vous pouvez trouver cette application déployée sur heroku à cette adresse htt
 
 On commence par afficher l'adresse connectée à l'aide de metamask et on affiche le numéro du block et la Chain ID.     
 Ensuite pour le NFT "Song for a City" que vous pouvez retrouver à cette adresse *"0x004a84209a0021b8ff182ffd8bb874c53f65e90e"* sur Rinkeby (et consulter sur OpenSea), on affiche le nombre d'exemplaires et les caractéristiques de ce token.   
-On a un bouton "Claim Token" qui nous permet de récupérer un token pour notre utilisateur.    
+On a un bouton "Claim Token" qui nous permet de récupérer un token pour notre utilisateur.  
+Cela ouvre la fenêtre Metamask et une fois la transaction validée, dans les logs de la transaction on a bien le nft.    
 Ensuite pour le NFT "Tout Doucement" disponible à l'adresse *"0x89150a0325ecc830a2304a44de98551051b4f466"*, on l'affiche et on dispose d'un bouton pour l'acheter.
 
 
